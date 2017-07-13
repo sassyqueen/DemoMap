@@ -1,5 +1,8 @@
 package demomap.android.myapplicationdev.com.demomap;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.PermissionChecker;
@@ -8,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,15 +41,22 @@ public class MainActivity extends AppCompatActivity {
             public void onMapReady(GoogleMap googleMap) {
                 map = googleMap;
 
-                int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION);
 
-                if (permissionCheck == PermissionChecker.PERMISSION_GRANTED) {
-                    map.setMyLocationEnabled(true);
-                    System.out.println("enabled");
-                } else {
-                    Log.e("GMap - Permission", "GPS access has not been granted");
-                }
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        1);
+
+
+
+
+
+
+
+
+
+
+
+
 
                 LatLng poi_CausewayPoint = new LatLng(1.436065, 103.786263);
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi_CausewayPoint,
@@ -108,6 +119,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+                    if (permissionCheck == PermissionChecker.PERMISSION_GRANTED) {
+                        map.setMyLocationEnabled(true);
+                        System.out.println("enabled");
+                    } else {
+                        Log.e("GMap - Permission", "GPS access has not been granted");
+                    }
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(MainActivity.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 }
 
